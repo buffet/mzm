@@ -5,18 +5,18 @@ MEMORY {
 }
 
 SECTIONS {
-    ewram (NOLOAD) : ALIGN(4) {}
+    ewram : ALIGN(4) {}
 
-    iwram (NOLOAD) : ALIGN(4) {
-        . = 0x03000043; softreset_disabled = .;
-        . = 0x03000c70; game_mode = .;
-        . = 0x0300137c; button_input = .;
-        . = 0x0300137e; button_input_old = .;
-        . = 0x03001380; buttons_changed = .;
-        . = 0x03007e60; sp_sys = .;
-        . = 0x03007fa0; sp_irq = .;
-        . = 0x03007ffc; intr_vector = .;
-    }
+    iwram : ALIGN(4) {
+        . = 0x00000043; softreset_disabled = .;
+        . = 0x00000c70; game_mode = .;
+        . = 0x0000137c; button_input = .;
+        . = 0x0000137e; button_input_old = .;
+        . = 0x00001380; buttons_changed = .;
+        . = 0x00007e60; sp_sys = .;
+        . = 0x00007fa0; sp_irq = .;
+        . = 0x00007ffc; intr_vector = .;
+    } >iwram
 
     rom : ALIGN(2) {
         asm/romheader.o(.text);
@@ -25,7 +25,7 @@ SECTIONS {
         asm/blob_0x0000023c-0x000007d0.o(.text);
         asm/check_softreset.o(.text);
         asm/blob_0x00000804-0x00000968.o(.text);
-        asm/update_input.o(.text);
+        src/update_input.o(.text);
         asm/blob_0x000009a0-0x00005190.o(.text);
         asm/syscalls.o(.text);
         asm/blob_0x000051d4-0x00800000.o(.text);

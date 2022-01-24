@@ -4,3 +4,4 @@
 *.o
 *.map
 *.bin
+src/*.s

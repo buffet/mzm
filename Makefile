@@ -14,6 +14,7 @@ GAME_REVISION = 00
 # Binaries
 TOOLCHAIN ?= arm-none-eabi-
 AS = $(TOOLCHAIN)as
+CC = ./tools/agbcc/agbcc
 LD = $(TOOLCHAIN)ld
 OBJCOPY = $(TOOLCHAIN)objcopy
 OBJDUMP = $(TOOLCHAIN)objdump
@@ -28,21 +29,24 @@ GBAFIX = tools/gbafix/gbafix
 
 # Flags
 ASFLAGS = -mcpu=arm7tdmi
+CCFLAGS = -O2 -mthumb-interwork
 
 # Objects
-ASM =                                                                          \
+ASM =                                                                        \
 	asm/romheader.s                                                            \
 	asm/crt0.s                                                                 \
 	asm/intr_main.s                                                            \
 	asm/blob_0x0000023c-0x000007d0.s                                           \
 	asm/check_softreset.s                                                      \
 	asm/blob_0x00000804-0x00000968.s                                           \
-	asm/update_input.s                                                         \
 	asm/blob_0x000009a0-0x00005190.s                                           \
 	asm/syscalls.s                                                             \
 	asm/blob_0x000051d4-0x00800000.s
 
-OBJ = $(ASM:.s=.o) $(BLOBS)
+SRC =                                                                        \
+  src/update_input.c
+
+OBJ = $(ASM:.s=.o) $(SRC:.c=.o) $(BLOBS)
 
 # Enable verbose output
 ifeq ($(V),1)
@@ -112,6 +116,10 @@ $(ELF) $(MAP): $(OBJ) linker.ld
 %.o: %.s
 	$(MSG) AS $@
 	$Q$(AS) $(ASFLAGS) $< -o $@
+
+%.s: %.c
+	$(MSG) CC $@
+	$Q$(CC) $(CCFLAGS) $< -o $@
 
 tools/%: tools/%.c
 	$(MSG) HOSTCC $@
