@@ -41,9 +41,8 @@ CPPFLAGS = -nostdinc -Isrc/
 # Objects
 CSRC = $(wildcard src/*.c) $(wildcard src/sram/*.c) $(wildcard src/libgcc/*.c)
 .PRECIOUS: $(CSRC:.c=.s)
-DATA = data/data_0x0808c71c.s
-ASMSRC = $(CSRC:.c=.s) $(wildcard asm/*.s) $(DATA)
-OBJ = $(ASMSRC:.s=.o)
+ASMSRC = $(CSRC:.c=.s) $(wildcard asm/*.s)
+OBJ = $(ASMSRC:.s=.o) 
 
 # Enable verbose output
 ifeq ($(V),1)
@@ -54,9 +53,12 @@ else
 	MSG = @echo " "
 endif
 
-
 .PHONY: all
 all: $(TARGET)
+
+.PHONY: extract
+extract:
+	$(MSG) MZM-Extractor -a
 
 .PHONY: check
 check: all
@@ -85,6 +87,8 @@ clean:
 	$Q$(RM) $(CSRC:.c=.s)
 	$(MSG) RM $(GBAFIX)
 	$Q$(RM) $(GBAFIX)
+	$(MSG) RM data/
+	$Q$(RM) -r data	
 
 .PHONY: help
 help:
@@ -94,11 +98,11 @@ help:
 	@echo '  dump: dump the ROMs'
 	@echo '  diff: compare the ROM with the original'
 	@echo '  clean: remove the ROM and intermediate files'
+	@echo '  extract: extract data as files using the MZM-Extractor (https://github.com/YohannDR/MZM-Extractor)'
 	@echo '  help: show this message'
 	@echo ''
 	@echo 'Flags:'
 	@echo '  V=1: enable verbose output'
-
 
 $(TARGET): $(ELF) $(GBAFIX)
 	$(MSG) OBJCOPY $@
